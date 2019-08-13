@@ -1,14 +1,10 @@
 setupRequired(afw)
 setupRequired(log)
 setupRequired(meas_algorithms)
-setupRequired(numpy)
-setupRequired(scons)
 setupRequired(sconsUtils)
 setupRequired(utils)
-setupRequired(pybind11)
 setupRequired(scarlet)
 
-setupOptional(matplotlib)
 setupOptional(testdata_deblender)
 
 envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
