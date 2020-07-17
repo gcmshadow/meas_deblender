@@ -139,19 +139,9 @@ class SourceDeblendConfig(pexConfig.Config):
     medianSmoothTemplate = pexConfig.Field(dtype=bool, default=True,
                                            doc="Apply a smoothing filter to all of the template images")
 
-## \addtogroup LSST_task_documentation
-## \{
-## \page SourceDeblendTask
-## \ref SourceDeblendTask_ "SourceDeblendTask"
-## \copybrief SourceDeblendTask
-## \}
-
 
 class SourceDeblendTask(pipeBase.Task):
-    """!
-    \anchor SourceDeblendTask_
-
-    \brief Split blended sources into individual sources.
+    """Split blended sources into individual sources.
 
     This task has no return value; it only modifies the SourceCatalog in-place.
     """
@@ -159,15 +149,19 @@ class SourceDeblendTask(pipeBase.Task):
     _DefaultName = "sourceDeblend"
 
     def __init__(self, schema, peakSchema=None, **kwargs):
-        """!
-        Create the task, adding necessary fields to the given schema.
+        """Create the task, adding necessary fields to the given schema.
 
-        @param[in,out] schema        Schema object for measurement fields; will be modified in-place.
-        @param[in]     peakSchema    Schema of Footprint Peaks that will be passed to the deblender.
-                                     Any fields beyond the PeakTable minimal schema will be transferred
-                                     to the main source Schema.  If None, no fields will be transferred
-                                     from the Peaks.
-        @param[in]     **kwargs      Passed to Task.__init__.
+        Parameters
+        ----------
+        schema : `lsst.afw.table.Schema`
+            Schema object for measurement fields; will be modified in-place.
+        peakSchema : `lsst.afw.table.peakSchema`
+            Schema of Footprint Peaks that will be passed to the deblender.
+            Any fields beyond the PeakTable minimal schema will be transferred
+            to the main source Schema. If None, no fields will be transferred
+            from the Peaks
+        **kwargs
+            Additional keyword arguments passed to ~lsst.pipe.base.task
         """
         pipeBase.Task.__init__(self, **kwargs)
         self.schema = schema
@@ -235,13 +229,14 @@ class SourceDeblendTask(pipeBase.Task):
 
     @pipeBase.timeMethod
     def run(self, exposure, sources):
-        """!
-        Get the psf from the provided exposure and then run deblend().
+        """Get the PSF from the provided exposure and then run deblend.
 
-        @param[in]     exposure Exposure to process
-        @param[in,out] sources  SourceCatalog containing sources detected on this exposure.
-
-        @return None
+        Parameters
+        ----------
+        exposure : `lsst.afw.image.Exposure`
+            Exposure to be processed
+        sources : `lsst.afw.table.SourceCatalog`
+            SourceCatalog containing sources detected on this exposure.
         """
         psf = exposure.getPsf()
         assert sources.getSchema() == self.schema
@@ -254,14 +249,20 @@ class SourceDeblendTask(pipeBase.Task):
 
     @pipeBase.timeMethod
     def deblend(self, exposure, srcs, psf):
-        """!
-        Deblend.
+        """Deblend.
 
-        @param[in]     exposure Exposure to process
-        @param[in,out] srcs     SourceCatalog containing sources detected on this exposure.
-        @param[in]     psf      PSF
+        Parameters
+        ----------
+        exposure : `lsst.afw.image.Exposure`
+            Exposure to be processed
+        srcs : `lsst.afw.table.SourceCatalog`
+            SourceCatalog containing sources detected on this exposure
+        psf : `lsst.afw.detection.Psf`
+            Point source function
 
-        @return None
+        Returns
+        -------
+        None
         """
         self.log.info("Deblending %d sources" % len(srcs))
 
@@ -441,7 +442,8 @@ class SourceDeblendTask(pipeBase.Task):
         return False
 
     def isMasked(self, footprint, mask):
-        """Returns whether the footprint violates the mask limits"""
+        """Returns whether the footprint violates the mask limits
+        """
         size = float(footprint.getArea())
         for maskName, limit in self.config.maskLimits.items():
             maskVal = mask.getPlaneBitMask(maskName)
@@ -455,8 +457,12 @@ class SourceDeblendTask(pipeBase.Task):
 
         We set the appropriate flags and mask.
 
-        @param source  The source to flag as skipped
-        @param mask  The mask to update
+        Parameters
+        ----------
+        source : `lsst.afw.table.SourceRecord`
+            The source to flag as skipped
+        mask : `lsst.afw.image.Mask`
+            The mask to update
         """
         fp = source.getFootprint()
         source.set(self.deblendSkippedKey, True)
